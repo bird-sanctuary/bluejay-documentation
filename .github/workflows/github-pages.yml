@@ -9,10 +9,11 @@ jobs:
   github-pages:
     runs-on: ubuntu-latest
     steps:
+      - uses: actions/checkout@v2
+
       # Generate diagrams
       - name: Install Dependencies
         run: |
-          mkdir ./puml/svgs
           sudo apt-get install graphviz
           sudo mkdir -p /opt/plantuml
           cd /opt/plantuml
@@ -22,7 +23,6 @@ jobs:
         run: java -jar /opt/plantuml/plantuml-1.2022.6.jar -v -tsvg -r -o "./svgs" "./puml/**.puml"
 
       # Jekyll
-      - uses: actions/checkout@v2
       - uses: actions/cache@v2
         with:
           path: vendor/bundle
