@@ -15,12 +15,12 @@ jobs:
           sudo apt-get install graphviz
           sudo mkdir -p /opt/plantuml
           cd /opt/plantuml
-          UML=https://github.com/plantuml/plantuml/releases/download/v1.2022.7/plantuml-1.2022.7.jar
+          UML=https://github.com/plantuml/plantuml/releases/download/v1.2022.6/plantuml-1.2022.6.jar
           sudo curl -JLO ${UML}
       - name: Checkout Repository
         uses: actions/checkout@v2
       - name: Process Diagrams
-        run: java -jar /opt/plantuml/plantuml-1.2022.7.jar -v -tsvg -r -o "./puml/svgs" "./puml/**.puml"
+        run: java -jar /opt/plantuml/plantuml-1.2022.6.jar -v -tsvg -r -o "./svgs" "./puml/**.puml"
 
   github-pages:
     runs-on: ubuntu-latest
