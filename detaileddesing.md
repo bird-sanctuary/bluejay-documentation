@@ -5,14 +5,14 @@ permalink: /detailed-design/
 ---
 
 ## Timer Interrupt Service Routines
-* [Timer0isr]({{ '/interrupt-0-isr/' | relative_url }})
-* [Timer1isr](timer1isr.md)
-* [Timer2isr](timer2isr.md)
-* [Timer3isr](timer3isr.md)
+* [Timer0isr]({{ '/timer-0-isr/' | relative_url }})
+* [Timer1isr]({{ '/timer-1-isr/' | relative_url }})
+* [Timer2isr]({{ '/timer-2-isr/' | relative_url }})
+* [Timer3isr]({{ '/timer-3-isr/' | relative_url }})
 
 ## Interrupts Service Routines
-* [Int0isr](int0isr.md)
-* [Int1isr](int1isr.md)
+* [Int0isr]({{ '/interrupt-0-isr/' | relative_url }})
+* [Int1isr]({{ '/interrupt-1-isr/' | relative_url }})
 
 ## Misc
-* [SchedulerRun()](SchedulerRun.md)
+* [SchedulerRun()]({{ '/scheduler-run/' | relative_url }})
