@@ -1,3 +1,0 @@
-# SchedulerRun()
-
-![SchedulerRun](SchedulerRun.svg)
