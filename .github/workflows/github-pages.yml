@@ -20,7 +20,7 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v2
       - name: Process Diagrams
-        run: java -jar /opt/plantuml/plantuml-1.2022.6.jar -v -tsvg -r -o "./puml/svgs" "./puml/**.puml"
+        run: java -jar /opt/plantuml/plantuml-1.2022.7.jar -v -tsvg -r -o "./puml/svgs" "./puml/**.puml"
 
   github-pages:
     runs-on: ubuntu-latest
