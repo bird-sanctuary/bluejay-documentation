@@ -1,0 +1,50 @@
+@startuml 
+start
+->MACRO: Decode DSHOT 2 bit
+  Used to decode two dshot bit at once in a frame
+  RX buffer contains time elapsed between two consecutive falling edges.
+  That is the reason why previous bit length is always substracted.
+Datas:
+ - dest - Restination register
+ - decode_fail - Jump destination in case decoding is not correct
+ - Temp1 - Rx timings buffer pointer
+ - Temp2 - Dshot pulse width criteria
+ - Temp6 - First bit's previous timestamp (stores for next two bits)
+ - Temp7 - Second bit's previous timestamp
+ 
+Store next bit previous timestamp;
+:Temp7 = *Temp1;
+->Check bit length is longer than minimum;
+if (*Temp1 < Temp6 + Temp2) then
+  ->Shorter -> Fail;
+  :GOTO decode_fail;
+endif
+:dest = dest << 1;
+->Check if time between two consecutive falling edges is smaller than the one for a 0;
+if (*Temp1 < Temp6 + Temp2 + Temp2) then
+  ->Shorter, this is a 1 -> Set lowest bit to 1;
+  :dest |= 1;
+endif
+
+->Increase rx buffer pointer;
+:Temp1++;
+
+->Store next bit previous timestamp;
+:Temp6 = *Temp1;
+if (*Temp1 < Temp7 + Temp2) then
+  ->Shorter -> Fail;
+  :GOTO decode_fail;
+endif
+:dest = dest << 1;
+->Check if time between two consecutive falling edges is smaller than the one for a 0;
+if (*Temp1 < Temp7 + Temp2 + Temp2) then
+  ->Shorter, this is a 1 -> Set lowest bit to 1;
+  :dest |= 1;
+endif
+
+->Increase rx buffer pointer;
+:Temp1++;
+stop
+@enduml
+
+

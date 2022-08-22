@@ -1,0 +1,39 @@
+@startuml 
+start
+->Timer2 interrupt routine
+Datas:
+ - Timer2_X - Counter that increments every 32ms
+ - Flag_32ms_Elapsed - Flag triggered when 32ms elapses in timer 2
+ - Rcp_Timeout_Cntd - RC Pulse Timeout counter is set to 10 each time a rc pulse is processed in timer 1,
+   after 320ms without receiving rc pulses in timer 1 it is set to 0
+ - Flag_Rcp_Stop - It is set when rc pulse read in timer 1 is 0 or when Rcp_Timeout_Cntd is timed out (320ms)
+ - Rcp_Stop_Cnt - Counts the number of 32ms cycles rc pulse is 0 (Flag_Rcp_Stop == 1).
+   Needed to enter run mode during 320ms (value 10) and exit run mode during 100ms (value 3)
+ ;
+:push ACC;
+->Clear timer 2 interrupt flag;
+:clr TMR2CN0_TF2H;
+->Increment Timer2_X;
+:inc Timer2_X;
+->Set 32ms elapsed flag;
+:set Flag_32ms_Elapsed;
+->Update RC pulse timeout counter;
+if (Rcp_Timeout_Cntd == 0) then (YES)
+  :setb Flag_Rcp_Stop;
+else (NO)
+  :Rcp_Timeout_Cntd--;
+endif 
+if (Flag_Rcp_Stop is set) then (YES)
+  if (Rcp_Stop_Cnt < 255) then (YES)
+  :Rcp_Stop_Cnt++;
+  else (NO)
+  endif
+else (NO)
+endif
+:pop ACC;
+:reti;
+stop
+@enduml
+
+
+
