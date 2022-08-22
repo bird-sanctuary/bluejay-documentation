@@ -6,25 +6,22 @@ on:
       - master
 
 jobs:
-  generate_plantuml:
+  github-pages:
     runs-on: ubuntu-latest
-    name: plantuml
     steps:
+      # Generate diagrams
       - name: Install Dependencies
         run: |
+          mkdir ./puml/svgs
           sudo apt-get install graphviz
           sudo mkdir -p /opt/plantuml
           cd /opt/plantuml
           UML=https://github.com/plantuml/plantuml/releases/download/v1.2022.6/plantuml-1.2022.6.jar
           sudo curl -JLO ${UML}
-      - name: Checkout Repository
-        uses: actions/checkout@v2
       - name: Process Diagrams
         run: java -jar /opt/plantuml/plantuml-1.2022.6.jar -v -tsvg -r -o "./svgs" "./puml/**.puml"
 
-  github-pages:
-    runs-on: ubuntu-latest
-    steps:
+      # Jekyll
       - uses: actions/checkout@v2
       - uses: actions/cache@v2
         with:
