@@ -1,8 +1,11 @@
 ---
-# Feel free to add content and custom Front Matter to this file.
-# To modify the layout, see https://jekyllrb.com/docs/themes/#overriding-theme-defaults
-
 layout: home
 ---
 
-text comes here - home info foo bla, links n stuff
+## Main Entry points
+* [Detailed Design Documentation]({{ '/detailed-design/' | relative_url }})
+* [Deadtime]({{ '/deadtime/' | relative_url }})
+
+## Additional Resources
+ * [BLDC Commutation resources](https://es.mathworks.com/help/mcb/ref/sixstepcommutation.html)
+ * [How to make your own esc (by DroneMesh)](https://www.youtube.com/playlist?list=PLoPtpxJIxgnbG5owAAyvgVvzenaRd1DPr)

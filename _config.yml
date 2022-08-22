@@ -18,8 +18,8 @@ description: >- # this means to ignore newlines until "baseurl:"
   Everything you always wanted to know about everyones
   favourite 8 Bit ESC firmware. More details than you can handle: Flow-charts
   and walls of text.
-baseurl: "" # the subpath of your site, e.g. /blog
-url: "" # the base hostname & protocol for your site, e.g. http://example.com
+baseurl: "/bluejay-documentation/" # the subpath of your site, e.g. /blog
+url: "https://bird-sanctuary.github.io/" # the base hostname & protocol for your site, e.g. http://example.com
 github_username:  bird-sanctuary
 
 # Build settings
