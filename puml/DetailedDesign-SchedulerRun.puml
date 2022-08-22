@@ -1,0 +1,98 @@
+@startuml 
+start
+->scheduler_run routine
+Datas:
+ - Flag_32ms_Elapsed - Flag triggered when 32ms elapses in timer 2
+ - Scheduler_Counter - Counter that increments every 32ms
+ - ADC0L - ADC0 Low Byte
+ - ADC0H - ADC0 High Byte
+ - Temp_Prot_Limit - Temperature protection limit setting
+ - Temp_Pwm_Level_Setpoint - Temperature protection pwm setpoint (changes depending on temperature)
+ - Pwm_Limit - High Pwm limit
+ - Flag_Ext_Tele - Indicates whether DSHOT command 13 has been received
+ - Ext_Telemetry_H - Extended Telemetry data high byte (when different to zero indicates there is extended telemetry data to send, besides edt type)
+ - Ext_Telemetry_L - Extended Telemetry data low byte
+ ;
+if (Flag_32ms_Elapsed == 0) then
+  :ret;
+  stop
+endif
+:Flag_32ms_Elapsed = 0;
+:A = Scheduler_Counter & 0x03;
+if (A == 1) then (ms 32)
+  if (Temp_Prot_Limit != 0) then
+  	->YES -> Clear setpoint;
+    if (ADC0H == 0) then
+      ->Temperature
+      above 25ºC;
+      if (ADC0L < Temp_Prot_Limit) then (yes)
+	    :Temp_Pwm_Level_Setpoint = 255;
+      else if (ADC0L < Temp_Prot_Limit + TEMP_LIMIT_STEP / 2) then (yes)
+	    :Temp_Pwm_Level_Setpoint = 200;
+      else if (ADC0L < Temp_Prot_Limit + 2 * TEMP_LIMIT_STEP / 2) then (yes)
+	    :Temp_Pwm_Level_Setpoint = 150;
+      else if (ADC0L < Temp_Prot_Limit + 3 * TEMP_LIMIT_STEP / 2) then (yes)
+	    :Temp_Pwm_Level_Setpoint = 150;
+      else
+	    :Temp_Pwm_Level_Setpoint = 50;
+      endif
+    else
+    endif
+  endif
+else if (A == 2) then (ms 64)
+  if (Temp_Prot_Limit != 0) then
+  	->YES -> Update PWM limit;
+  	if (Pwm_Limit == Temp_Pwm_Level_Setpoint) then
+  	else if (Pwm_Limit > Temp_Pwm_Level_Setpoint) then
+  	  if (Pwm_limit > 0) then
+  	    :Pwm_Limit--;
+  	  endif
+  	else
+  	  if (Pwm_Limit < 255) then
+  	    :Pwm_Limit++;
+  	  endif
+  	endif
+  endif
+else if (A == 3) then (ms 96)
+  :Stop_Adc();
+  :Start_Adc();
+endif
+->1024ms scheduler;
+:A = Scheduler_Counter & 0x1F;
+if (Flag_Ext_Tele) then (yes)
+  if (A == 4) then (ms 128)
+    if (ADC0H == 0) then
+      ->Below 25ºC;
+      :A = ADC0L - (255 - 20);
+      if (A < 0) then (clamp to 0)
+        :A = 0;
+      endif
+    else
+      ->Above 25ºC;
+      :A = ADC0L + 20; 
+    endif
+    ->Put telemetry for sending;
+    :Ext_Telemetry_L = A;
+    :Ext_Telemetry_H = 0x02;
+  else if (A == 8) then (ms 256)
+  	->ms 256
+  	Stub for debug 0;
+    :Ext_Telemetry_L = 0x08;
+    :Ext_Telemetry_H = 0x088;
+  else if (A == 12) then ()
+  	->ms 384
+  	Stub for debug 1;
+    :Ext_Telemetry_L = 0x0A;
+    :Ext_Telemetry_H = 0x0AA;
+  else if (A == 16) then (ms 512)
+  	->ms 512
+  	Stub for debug 2;
+    :Ext_Telemetry_L = 0x0C;
+    :Ext_Telemetry_H = 0x0CC;
+  endif
+endif
+:ret;
+stop
+@enduml
+
+

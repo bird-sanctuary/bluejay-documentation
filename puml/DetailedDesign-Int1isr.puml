@@ -1,0 +1,30 @@
+@startuml 
+start
+->Int1 interrupt routine.
+Used for RC pulse timing
+ 
+Datas:
+ - Uses register bank 1
+ - Temp1 - Rx buffer pointer, that contains times between falling edges
+ - TL0 - Timer 0 low byte. Contains time between two falling edges
+ - TL1 - Timer 1 low byte. To be loaded with DShot_Timer_Preset value. 
+
+->Disable Int1 interrupt;
+:IE_EX1 = 0;
+->Start timer 1;
+:TCON_TR1 = 1;
+->Note: Interrupts are not explicitly disabled, assuming higher priority interrupts:
+- Timer0 to be disabled at this point
+- Int0 to not trigger for valid DShot signal
+Disable timer 2;
+:TMR2CN0_TR2 = 0;
+->Store timer 2 value;
+:DShot_Frame_Start_L = TMR2L; 
+:DShot_Frame_Start_H = TMR2H;
+->Enable timer 2;
+:TMR2CN0_TR2 = 1;
+:reti;
+stop
+@enduml
+
+

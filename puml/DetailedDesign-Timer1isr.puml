@@ -1,0 +1,530 @@
+@startuml 
+start
+->OutsideRange function;
+if (Rcp_Outside_Range_Cnt < 255) then (yes)
+  :Rcp_Outside_Range_Cnt++;
+endif
+
+if (Rcp_Outside_Range_Cnt <= 50) then
+  ->yes -> RCP signal has not timed out, 
+  but pulses are not recognized as DShot
+  Set pulse lenght to 0 & reset dshot command;
+  :Flag_Rcp_Stop = 1;
+  :DShot_Cmd = 0;
+  :DShot_Cmd_Cnt = 0;
+else
+  ->no -> Set timeout count;
+  :Rcp_Timeout_Cntd = 10;
+endif
+
+->Do not send telemetry. Set tx pointer to start, 
+reset timer 0 and enable int0 and int1;
+:Temp1 = 0;
+:TL0 = 0;
+:IE_EX0 = 1;
+:IE_EX1 = 1;
+:ret;
+stop
+@enduml
+
+
+@startuml 
+start
+->Timer1 interrupt routine:
+
+  Decode DShot frame
+  Process new throttle value and update pwm registers
+  Schedule DShot telemetry
+
+Datas:
+	Uses register bank 1
+	Temp1 - Telemetry tx/rx buffer pointer
+
+Disable Int0 interrupts;
+:clr IE_EX0;
+->Stop timer 1;
+:clr TCON_TR1;
+->Reset sync timer;
+:mov TL1, DShot_Timer_Preset;
+->Select register bank 1 and push used registers in stack;
+:push PSW;
+:mov PSW, #8h;
+:push ACC;
+:push B;
+
+->Note: Interrupts are not explicitly disabled
+Assume higher priority interrupts (Int0, Timer0) to be disabled at this point
+
+Disable, read, and enable timer 2;
+:clr TMR2CN0_TR2;
+:Temp2 = TMR2L;
+:Temp3 = TMR2H;
+:setb TMR2CN0_TR2;
+
+->Check frame time length;
+:Temp2 -= DShot_Frame_Start_L;
+
+if ((Temp3 != DShot_Frame_Start_H) || 
+    (Temp2 < DShot_Frame_Length_Thr) || 
+    (Temp2 > 2 * DShot_Frame_Length_Thr) ||
+    (Temp1 != 16)) then
+  ->yes -> Frame too long or
+  frame too short or
+  rx pointer != 16;
+  :OutsideRange();
+  ->Restore registers and status word from stack;
+  :pop B;
+  :pop ACC;
+  :pop PSW;
+  :reti;
+  stop
+endif
+
+->no -> Start decoding received data
+Set pointer to 0;
+:Temp1 = 0;
+->DSHOT pulse width depending on detected speed on startup;
+:Temp2 = DShot_Pwm_Thr;
+->Reset timestamp;
+:Temp6 = 0;
+->Decode DShot data Msb. Use more code space to save time (by not using loop);
+if (NOT Decode_DShot_2Bit(Temp5)) then
+  :OutsideRange();
+  ->Restore registers and status word from stack;
+  :pop B;
+  :pop ACC;
+  :pop PSW;
+  :reti;
+  stop
+endif
+if (NOT Decode_DShot_2Bit(Temp5)) then
+  :OutsideRange();
+  ->Restore registers and status word from stack;
+  :pop B;
+  :pop ACC;
+  :pop PSW;
+  :reti;
+  stop
+endif
+->Decode DShot data Lsb;
+if (NOT Decode_DShot_2Bit(Temp4)) then (yes)
+  :OutsideRange();
+  ->Restore registers and status word from stack;
+  :pop B;
+  :pop ACC;
+  :pop PSW;
+  :reti;
+  stop
+endif
+if (NOT Decode_DShot_2Bit(Temp4)) then (yes)
+  :OutsideRange();
+  ->Restore registers and status word from stack;
+  :pop B;
+  :pop ACC;
+  :pop PSW;
+  :reti;
+  stop
+endif
+if (NOT Decode_DShot_2Bit(Temp4)) then (yes)
+  :OutsideRange();
+  ->Restore registers and status word from stack;
+  :pop B;
+  :pop ACC;
+  :pop PSW;
+  :reti;
+  stop
+endif
+if (NOT Decode_DShot_2Bit(Temp4)) then (yes)
+  :OutsideRange();
+  ->Restore registers and status word from stack;
+  :pop B;
+  :pop ACC;
+  :pop PSW;
+  :reti;
+  stop
+endif
+->Decode DShot data checksum;
+if (NOT Decode_DShot_2Bit(Temp3)) then (yes)
+  :OutsideRange();
+  ->Restore registers and status word from stack;
+  :pop B;
+  :pop ACC;
+  :pop PSW;
+  :reti;
+  stop
+endif
+if (NOT Decode_DShot_2Bit(Temp3)) then (yes)
+  :OutsideRange();
+  ->Restore registers and status word from stack;
+  :pop B;
+  :pop ACC;
+  :pop PSW;
+  :reti;
+  stop
+endif
+->At this point Temp3 lo nibble contains crc
+Temp4 contains DSHOT lowest 8 bit data
+Temp5 contains DSHOT hiest 4 bit data
+crc_calculated = (value ^ (value >> 4) ^ (value >> 8)) & 0x0F;
+:A = Temp4;
+:swap A;
+: A = A ^ Temp4;
+: A = A ^ Temp5;
+: A = A ^ Temp3;
+if (Flag_Rcp_DShot_Inverted) then
+  ->yes -> Invert A;
+  :A = ~A;
+endif
+:A = A & 0x0f;
+if (A != 0) then
+  ->yes -> crc doesn't match;
+  :OutsideRange();
+  ->Restore registers and status word from stack;
+  :pop B;
+  :pop ACC;
+  :pop PSW;
+  :reti;
+  stop
+endif
+->Invert dshot data and substract 96;
+:A = Temp4;
+:A = ~A;
+->Temp3 now has dshot lo data byte inverted;
+:Temp3 = A;
+:A -= 96;
+->Temp4 now has dshot lo data byte inverted -96 in case it is a DSHOT command
+Be aware that there is a CARRY_BIT as result of this substraction;
+:Temp4 = A;
+:A = Temp5;
+:A = ~A;
+:A &= 0x0F;
+:A = A - (0 + CARRY_BIT);
+:Temp5 = A;
+if (Temp5::Temp4 < 96) then
+  ->yes -> DSHOT command range;
+  :A = Temp3;
+  :Temp4 = 0;
+  :Temp5 = 0;
+  if (A == 0) then
+    ->yes -> Clear current ongoing command if any;
+    :DShot_Cmd = 0;
+    :DShot_Cmd_Cnt = 0;
+  else
+    ->no -> Check carry is correct;
+    :CARRY_BIT = 0;
+    :A = A >> 1;
+    ->CARRY_BIT now has the previous lowest bit in A;
+    if (CARRY_BIT == 0) then
+      ->yes -> Carry bit is incorrect. Incorrect DSHOT command;
+      :DShot_Cmd = 0;
+      :DShot_Cmd_Cnt = 0;
+    else if (A != DShot_Cmd) then
+      ->yes -> New command different to the previous one;
+      :DShot_Cmd = A;
+      :DShot_Cmd_Cnt = 0;
+    else
+      ->no -> Same command as previous one;
+      :DShot_Cmd_Cnt++;
+    endif
+  endif
+endif
+->Check for bidirectional operation (0=stop, 96-2095->fwd, 2096-4095->rev);
+if (Flag_Pgm_Bidir == 1) then
+  ->yes -> substract 2000 still 12bit;
+  :CARRY_BIT = 0;
+  :A = Temp4;
+  :A -= 0xD0;
+  :B = A;
+  :A = Temp5;
+  :A -= 0x07;
+  ->A::B now is Temp5::Temp4 - 2000;
+  if (A::B > 2000) then
+    ->yes -> Use substracted value;
+    :Temp5 = A;
+    :Temp4 = B;
+  endif
+  ->Check programmed direction;
+  if (Flag_Pgm_Dir_Rev == 1) then
+    ->yes -> Reverse direction;
+    :CARRY_BIT = ~CARRY_BIT;
+  endif
+  :Flag_Rcp_Dir_Rev = CARRY_BIT;
+  ->Multiply throttle value by 2;
+  :CARRY_BIT = 0;
+  :Temp4 = Temp4 << 1;
+  :Temp5 = Temp5 << 1;
+endif
+->From here Temp5/Temp4 should be at most 3999 (4095-96);
+:A = Temp4;
+:A = A & 0xF0;
+:A = A | Temp5;
+:swap A;
+:B = 5;
+:A = A / B;
+->Temp3 = (Temp5::Temp4 / 16) / 5;
+:Temp3 = A;
+->Align Temp5::Temp4 to 11bit;
+:CARRY_BIT = 0;
+:Temp5 = Temp5 >> 1;
+:A = Temp4;
+:A = A >> 1;
+:A += Temp3;
+:Temp4 = A;
+:A = Temp5;
+:A = A + (0 + CARRY_BIT);
+:Temp5 = A;
+->Temp5::Temp4 is now scaled from 0-2000 to 0-2048 (sort of, not exact);
+if (Temp5.3 != 0) then
+  ->yes - limit to 11 bit maximum;
+  :Temp4 = 0xFF;
+  :Temp5 = 0x07;
+endif
+if (Flag_Motor_Started == 0 && Flag_Initial_Run_Phase == 1) then
+  ->Increase startup power if motor has not started and rc pulse is small;
+  if (Temp5 == 0) then
+    ->yes -> Read minimum startup setting from 'external' memory;
+    :B = *Pgm_Startup_Power_Min;
+    ->Set power to at least be minimum startup power;
+    :CARRY_BIT = 0;
+    :A = Temp4;
+    :A -= B;
+    ->A < B -> CARRY_BIT == 1;
+    if (CARRY_BIT == 1) then
+      ->yes -> Set A = *Pgm_Startup_Power_Min;
+      :A = B;
+    endif    
+  endif
+  ->Check stall count;
+  :A = Startup_Stall_Cnt;
+  if (A != 0) then
+    ->yes -> boost startup. Note. Startup_Stall_Cnt shall be smaller to 6;
+    :B = 0x40;
+    :A = A * B;
+    :A += Temp4;
+    ->Temp4 = Temp4 + Startup_Stall_Cnt * 0x40;    
+    :Temp4 = A;
+    :A = Temp5;
+    :A = A + (0 + CARRY_BIT);
+    ->Temp5::Temp4 = Temp5::Temp4 + Startup_Stall_Cnt * 0x40;    
+    :Temp5 = A;
+  endif
+endif
+->Convert Temp5::Temp4 rc pulse to a 8 bit value;
+:A = Temp4;
+:A = A & 0xF8;
+:A = A | Temp5;
+->Swap lo and hi nibbles;
+:swap A;
+->Rolls A to the left, bit 0 gets bit 7 value;
+:A = A << 1;
+->Temp2 = Temp5::Temp4 >> 3;
+if (Temp2 == 0) then
+  ->yes -> set Flag_Rcp_Stop;
+  :Flag_Rcp_Stop = 1;
+else
+  ->no -> clear Flag_Rcp_Stop and set Rcp_Stop_Cnt to 0;
+  :Flag_Rcp_Stop = 0;
+  :Rcp_Stop_Cnt = 0;
+endif
+if (Rcp_Outside_Range_Cnt != 0) then
+  ->yes -> decrement;
+  :Rcp_Outside_Range_Cnt--;
+endif
+->Select minimum PWM limit;
+:Temp6 = Pwm_Limit;
+if (Temp6 > Pwm_Limit_By_Rpm) then
+  ->yes -> update to pwm limit by rpm;
+  :Temp6 = Pwm_Limit_By_Rpm;
+endif
+->Apply pwm limit
+  Temp2 is 8 bit rc pulse
+  Temp6 is Pwm limit;
+if (Temp2 > Temp6) then
+  ->yes -> rc pulse bigger than pwm limit;
+  if (PWM_BITS_H == 0) then
+    ->YES -> 8 bit;
+    :Temp2 = Temp6;
+  else
+    ->NO -> set 11bit rc pulse = pwm limit * 8;
+    :A = Temp6;
+    :B = 8;
+    :A = A * B;
+    :Temp4 = A;
+    :Temp5 = B;
+  endif
+endif
+->Scale pwm resolution and invert (duty cycle is defined inversely);
+if (PWM_BITS_H == 3) then
+  ->11bit pwm;
+  :A = Temp5;
+  :A = ~A;
+  :A = A & 0x07;
+  :Temp3 = A;
+  :A = Temp4;
+  :A = ~A;
+  ->Temp3::Temp2 = ~Temp5::Temp4;
+  :Temp2 = A;
+else if (PWM_BITS_H == 2) then
+  ->10bit pwm;
+  :CARRY_BIT = 0;
+  :A = Temp5;
+  :A = CARRY_BIT::A >> 1;
+  :A = ~A;
+  :A = A & 0x03;
+  :Temp3 = A;
+  :A = Temp4;
+  :A = CARRY_BIT::A >> 1;
+  :A = ~A;
+  :Temp2 = A;
+else if (PWM_BITS_H == 1) then
+  ->9 bit pwm;
+  :B = Temp5;
+  :A = Temp4;
+  :CARRY_BIT = B.0;
+  :A = CARRY_BIT::A >> 1;
+  :CARRY_BIT = B.1;
+  :A = CARRY_BIT::A >> 1;
+  :A = ~A;
+  :Temp2 = A;
+  :A = Temp5;
+  :A = A >> 1;
+  :A = A >> 1;
+  :A = ~A;
+  :A = A & 0x01;
+  :Temp3 = A;
+else
+  ->8 bit pwm;
+  :A = Temp2;
+  :A = ~A;
+  :Temp2 = A;
+  :Temp3 = 0;
+endif
+->11-bit effective dithering of 8/9/10-bit pwm;
+if (PWM_BITS_H < 3) then (yes)
+  if (Flag_Dithering == 1) then
+    ->yes -> Apply dithering;
+    :A = Temp4;
+    :A = ~A;
+    :A = A & ((1 << (3 - PWM_BITS_H)) - 1);
+    ->A contains the index into dithering patterns;
+    :A = A + &Dithering_Patterns;
+    ->Reuse DSHOT pwm pointer because at this point it is not in use;
+    :Temp1 = A;
+    ->Read pattern;
+    :A = *Temp1;
+    ->Rotate pattern;
+    :A = A << 1;
+    ->Store pattern;
+    :*Temp1 = A;
+    if (A.0 == 1) then
+      ->yes -> Increment pwm if bit is set;
+      :A = Temp2;
+      :A = A + 1;
+      :Temp2 = A;
+      if (A == 0) then
+        ->yes -> propagate carry bit to temp3;
+        if (PWM_BITS_H != 0) then (yes)
+          :A = Temp3;
+          :A = A + 0 + CARRY_BIT;
+          :Temp3 = A;
+          if (A.PWM_BITS_H == 1) then
+            ->yes -> Avoid overflow;
+            :Temp3 = Temp3 - 1;
+          endif
+        endif
+        :Temp2 = Temp2 - 1;
+      endif
+    endif
+  endif
+endif
+->Set pwm registers;
+if (DEADTIME != 0) then
+  ->yes -> Subtract dead time from normal pwm and store as damping pwm
+  Damping pwm duty cycle will be higher because numbers are inverted;
+  :CARRY_BIT = 0;
+  ->Skew damping FET timing;
+  :A = Temp2;
+  if (MCU_48MHZ == 0) then (yes)
+    :A = A - ((DEADTIME + 1) >> 1);
+  else (no)
+    :A = A - DEADTIME;
+  endif
+  :Temp4 = A;
+  :A = Temp3;
+  :A = A - (0 + CARRY_BIT);
+  :Temp5 = A;
+  if  (A == 0) then
+    ->yes -> Set to minimum value;
+    :A = 0;
+    :Temp4 = 0;
+    :Temp5 = 0;
+  else
+    ->no -> Set to max braking;
+    :CARRY_BIT = 0;
+    :A = Temp4;
+    :A = A - Pwm_Braking_L;
+    :A = Temp5;
+    :A = A - (Pwm_Braking_L + CARRY_BIT);
+    if (CARRY_BIT == 0) then
+      ->yes -> Is braking pwm more than maximum allowed braking?;
+      :Temp4 = Pwm_Braking_L;
+      :Temp5 = Pwm_Braking_H;
+    endif
+  endif
+endif
+->Note: Interrupts are not explicitly disabled
+Assume higher priority interrupts (Int0, Timer0) to be disabled at this point
+Set pwm registers;
+if (PWM_BITS_H != 0) then (yes)
+  :Set_Power_Pwm_Reg_L(Temp2);
+  :Set_Power_Pwm_Reg_H(Temp3);
+else (no)
+  :Set_Power_Pwm_Reg_L(Temp2);
+endif
+->Set deadtime registers;
+if (DEADTIME != 0) then (yes)
+  if (PWM_BITS_H != 0) then (yes)
+    :Set_Damp_Pwm_Reg_L(Temp4);
+    :Set_Damp_Pwm_Reg_H(Temp5);
+  else (no)
+    :Set_Damp_Pwm_Reg_L(Temp4);
+  endif
+endif
+->Set timeout count;
+:Rcp_Timeout_Cntd = 10;
+->Prepare DShot telemetry;
+if (Flag_Rcp_DShot_Inverted == 1 && Flag_Telemetry_Pending == 1) then
+  ->yes -> Prepare Timer0 for sending telemetry data
+  Timer0 is system clock divided by 4;
+  :CKCON0 = 0x01;
+  ->Timer0 runs free not gated by Int0;
+  :TMOD = 0xA2;
+  ->Configure RTX_PIN for digital output
+  Default to high level;
+  :RTX_BIT = 1;
+  ->Set output mode to push-pull;
+  :RTX_MDOUT = RTX_MDOUT | (1 << RTX_PIN);
+  ->Set tx pointer to start;
+  :Temp1 = 0;
+  ->Note: Delay must be large enough to ensure port is ready for output
+  Telemetry will begin after this delay;
+  :TL0 = DShot_GCR_Start_Delay;
+  ->Clear Timer0 overflow flag;
+  :TCON_TF0 = 0;
+  ->Enable Timer0 interrupts;
+  :IE_ET0 = 1;
+else
+  ->no -> Do not send telemetry. Set tx pointer to start, 
+  reset timer 0 and enable int0 and int1;
+  :Temp1 = 0;
+  :TL0 = 0;
+  :IE_EX0 = 1;
+  :IE_EX1 = 1;
+endif
+->Restore registers and status word from stack;
+:pop B;
+:pop ACC;
+:pop PSW;
+:reti;
+stop
+@enduml

@@ -1,0 +1,60 @@
+@startuml 
+start
+->Timer0 interrupt routine;
+:Push PSW;
+:Select Register Bank 2;
+-> Datas:
+ - Bank2.Temp1 contains the address of bytes in Temp_Storage array
+ - Bank2.Temp8 contains timer0/1 clock settings
+ - Temp_Storage array contains the lo and hi parts of every bit
+semicycle to be transmitted;
+:Temp1--;
+if (Temp1 < &Temp_Storage - 1) then
+  ->YES
+  Increase Temp1 so it indexes an address
+  inside the Temp_Storage array;
+  :Temp1++;
+  
+  ->If last pulse is high, it is the last possitive semicycle,
+  so telemetry sending is finished,
+  otherwise wait for it to return to high;
+  if (RTX_BIT == 1) then
+    ->YES -> FINISH SENDING DATA BACK TO FC
+    Configure RTX_PIN for digital input
+    Set RTX_PIN output mode to open-drain;
+    :RTX_MDOUT &= RTX_PIN_DISABLE_MASK;
+    ->Set RTX_PIN to Float high;
+    :setb RTX_BIT;
+    ->Disable Timer0 interrupts;
+    :clr IE_ET0;
+    ->Restore regular DShot Timer0/1 clock settings;
+    :CKCON0 = Temp8;
+    -> Timer0/1 gated by Int0/1;
+    :TMOD = 0AAh;
+    ->Clear Int0 & Int1 pending flags;
+    :clr TCON_IE0;
+    :clr TCON_IE1;
+    ->Mark that new telemetry packet may be created;
+    :clr Flag_Telemetry_Pending;
+  else
+    ->NO -> PERFORM A TRANSITION
+    Invert signal level;
+    :complement RTX_BIT;
+    ->Reload the timer to be triggered at the end of the bit semicycle;
+    :Timer 0 Low Byte = *Temp1;
+  endif
+else
+    ->NO -> PERFORM A TRANSITION
+    Invert signal level;
+    :complement RTX_BIT;
+    ->Reload the timer to be triggered at the end of the bit semicycle;
+    :Timer 0 Low Byte = *Temp1;
+endif
+	->Return;
+    :Pop PSW;
+    :reti;
+stop
+@enduml
+
+
+
