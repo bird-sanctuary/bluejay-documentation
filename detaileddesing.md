@@ -5,7 +5,7 @@ permalink: /detailed-design/
 ---
 
 ## Timer Interrupt Service Routines
-* [Timer0isr](timer0isr.md)
+* [Timer0isr]({{ '/interrupt-0-isr/' | relative_url }})
 * [Timer1isr](timer1isr.md)
 * [Timer2isr](timer2isr.md)
 * [Timer3isr](timer3isr.md)
