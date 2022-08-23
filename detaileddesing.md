@@ -45,8 +45,8 @@ which means that the register values would need to be set like so:
 * [Timer 2 ISR]({{ '/timer-2-isr/' | relative_url }})
 * [Timer 3 ISR]({{ '/timer-3-isr/' | relative_url }})
 
-## Interrupts Service Routines
-Interrupts are a bit more intuitive: An external input triggers the according ISR. BB based MCUs have 2 hardware interrupts with dedicated interrupt vectors, but technically GPIO pins can also be used, although with a shared interrupt vector.
+## Hardware Interrupt Service Routines
+Hardware interrupts are a bit more intuitive: An external input triggers the according ISR. BB based MCUs have 2 hardware interrupts with dedicated interrupt vectors, but technically GPIO pins can also be used as interrupts, although with a shared interrupt vector.
 
 Hardware interrupts are triggered on state change, so either falling edge, rising edge or either.
 
