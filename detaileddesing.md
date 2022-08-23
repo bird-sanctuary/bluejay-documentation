@@ -22,7 +22,7 @@ The clock frequency is divided by 12 (on 8051 based timers) and the timers count
 > EFM8 provides different sources for the clock frequency and depending on source also different divisors. When using the system clock, divisors for the timer can be: 12, 4 and 48 (on timer 0 and 1) or 12 on timers 2, 3 and 4. <br/>
 If using an external clock, the divisor can only be 8.
 
-8051 based timers are 16Bit wide (having a low and a high Byte) and are thus capable of counting to 65535 before overflowing back to 0.
+8051 based timers are (up to) 16Bit wide (having a low and a high Byte) and are thus capable of counting to 65535 before overflowing back to 0.
 
 If you want to invoke a routine every 10ms the calculation would look like so:
 
@@ -46,8 +46,12 @@ which means that the register values would need to be set like so:
 * [Timer 3 ISR]({{ '/timer-3-isr/' | relative_url }})
 
 ## Interrupts Service Routines
-* [Int 0 ISR]({{ '/interrupt-0-isr/' | relative_url }})
-* [Int 1 ISR]({{ '/interrupt-1-isr/' | relative_url }})
+Interrupts are a bit more intuitive: An external input triggers the according ISR. BB based MCUs have 2 hardware interrupts with dedicated interrupt vectors, but technically GPIO pins can also be used, although with a shared interrupt vector.
+
+Hardware interrupts are triggered on state change, so either falling edge, rising edge or either.
+
+* [INT0 ISR]({{ '/interrupt-0-isr/' | relative_url }})
+* [INT1 ISR]({{ '/interrupt-1-isr/' | relative_url }})
 
 ## Misc
 * [SchedulerRun()]({{ '/scheduler-run/' | relative_url }})
