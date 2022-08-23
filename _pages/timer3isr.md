@@ -8,6 +8,6 @@ exclude: true
 Triggered every **500ns**
 
 Used for:
-* Commutation timeouts
+* Commutation timings
 
 [![Int3isr]({{'/puml/svgs/DetailedDesign-Timer3isr.svg' | relative_url}})]({{'/puml/svgs/DetailedDesign-Timer3isr.svg' | relative_url}})

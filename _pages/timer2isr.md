@@ -5,10 +5,10 @@ permalink: /timer-2-isr/
 exclude: true
 ---
 
-Triggered every **500ns**
+Triggered every **32ms**
 
 Used for:
-* RC pulse timeouts
-* Commutation times
+* Counting RC pulse timeouts
+* Counting commutation errors
 
 [![Int2isr]({{'/puml/svgs/DetailedDesign-Timer2isr.svg' | relative_url}})]({{'/puml/svgs/DetailedDesign-Timer2isr.svg' | relative_url}})

@@ -4,13 +4,13 @@ title: Detailed Design
 permalink: /detailed-design/
 ---
 
-Two different kinds of interrupts exist - **timer based** and **hardware based**. Bluejay is taking advantage of both types for different tasks. Interrupt Service Routines are the functions invoked when an interrupt is triggered and take over code execution immediately - no matter what the main code execution is doing, it is stopped, the interrupt service routine takes over, does its job and regular code execution takes over again.
+Two different kinds of interrupts exist - **timer based** and **external**. Bluejay is taking advantage of both types for different tasks. Interrupt Service Routines are the functions invoked when an interrupt is triggered and take over code execution immediately - no matter what the main code execution is doing, it is stopped, the interrupt service routine takes over, does its job and regular code execution takes over again.
 
 > Best practice is to keep interrupt service routines as short as possible as not to run into race conditions where one routine is interrupted by another routine.
 
 Interrupts can also be disabled, which makes sense if you for example know that you have to finish a certain block of code without any further interruption. Oftentimes interrupts are disabled in interrupt service routines as to not run into any race conditions.
 
-## Timer Interrupt Service Routines
+## Timer Interrupts
 Timer based interrupts, trigger - as the name suggests - at given times. Timer based interrupts consist of a counter, once it overflows back to zero, the matching ISR is triggered.
 
 The calculation of the time is not as easy as just saying: "Trigger every 30ms". The calculation is more involved:
@@ -36,19 +36,19 @@ since we can only count to integers we need to take the next closes value, so th
 > regValue = 65535 - 41667 = 23868
 
 which means that the register values would need to be set like so:
-> regValue = 0x5D3C
+> regValue = 0x5D3C <br/>
 > regValueHi = 0x5D <br/>
-> regValueLo = 0X3C
+> regValueLo = 0x3C
 
 * [Timer 0 ISR]({{ '/timer-0-isr/' | relative_url }})
 * [Timer 1 ISR]({{ '/timer-1-isr/' | relative_url }})
 * [Timer 2 ISR]({{ '/timer-2-isr/' | relative_url }})
 * [Timer 3 ISR]({{ '/timer-3-isr/' | relative_url }})
 
-## Hardware Interrupt Service Routines
-Hardware interrupts are a bit more intuitive: An external input triggers the according ISR. BB based MCUs have 2 hardware interrupts with dedicated interrupt vectors, but technically GPIO pins can also be used as interrupts, although with a shared interrupt vector.
+## Externally triggered Interrupts
+Externally triggered interrupts are a bit more intuitive: An external input triggers the according ISR. BB based MCUs have two interrupts with dedicated interrupt vectors that can be triggered externally. Technically GPIO pins can also be used as interrupts, although with a shared interrupt vector.
 
-Hardware interrupts are triggered on state change, so either falling edge, rising edge or either.
+Externally triggered interrupts are triggered on state change, so either falling edge, rising edge or both.
 
 * [INT0 ISR]({{ '/interrupt-0-isr/' | relative_url }})
 * [INT1 ISR]({{ '/interrupt-1-isr/' | relative_url }})
