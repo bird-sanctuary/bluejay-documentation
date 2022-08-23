@@ -5,4 +5,9 @@ permalink: /timer-1-isr/
 exclude: true
 ---
 
-![Int0isr]({{'/puml/svgs/DetailedDesign-Timer1isr.svg' | relative_url}})
+Triggered every **41.76ns**
+
+Used for:
+* DShot frame sync detection
+
+[![Int1isr]({{'/puml/svgs/DetailedDesign-Timer1isr.svg' | relative_url}})]({{'/puml/svgs/DetailedDesign-Timer1isr.svg' | relative_url}})

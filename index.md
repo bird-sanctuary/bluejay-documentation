@@ -11,6 +11,8 @@ You will find a lot of flow charts to visualize what the code does. The ultimate
 * [Deadtime]({{ '/deadtime/' | relative_url }})
 
 ## Additional Resources
+A collection of useful external resources related to ESCs you might want to read up on:
+
  * [BLDC Commutation resources](https://es.mathworks.com/help/mcb/ref/sixstepcommutation.html)
  * [How to make your own esc (by DroneMesh)](https://www.youtube.com/playlist?list=PLoPtpxJIxgnbG5owAAyvgVvzenaRd1DPr)
  * [DSHOT - The missing handbook](https://brushlesswhoop.com/dshot-and-bidirectional-dshot/)
