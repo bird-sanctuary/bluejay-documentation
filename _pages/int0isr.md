@@ -1,6 +1,6 @@
 ---
 layout: page
-title: Interrup 0 ISR
+title: Interrupt 0 ISR
 permalink: /interrupt-0-isr/
 exclude: true
 ---

@@ -4,6 +4,10 @@ title: Detailed Design
 permalink: /detailed-design/
 ---
 
+## MACROS
+* [DecodeDshot2bit]({{ '/decode-dshot-2bit/' | relative_url }})
+* [OutsideRange]({{ '/outside-range/' | relative_url }})
+
 ## Timer Interrupt Service Routines
 * [Timer0isr]({{ '/timer-0-isr/' | relative_url }})
 * [Timer1isr]({{ '/timer-1-isr/' | relative_url }})

@@ -5,4 +5,4 @@ permalink: /timer-2-isr/
 exclude: true
 ---
 
-![Int0isr]({{'/puml/svgs/DetailedDesign-Timer2isr.svg' | relative_url}})
+![Timer2isr]({{'/puml/svgs/DetailedDesign-Timer2isr.svg' | relative_url}})
