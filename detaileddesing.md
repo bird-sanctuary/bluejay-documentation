@@ -59,3 +59,4 @@ Externally triggered interrupts are triggered on state change, so either falling
 
 ## Misc
 * [SchedulerRun()]({{ '/scheduler-run/' | relative_url }})
+* [WaitMs()]({{ '/wait-ms/' | relative_url }})
