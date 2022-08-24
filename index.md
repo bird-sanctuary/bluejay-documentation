@@ -15,7 +15,7 @@ A collection of useful external resources related to ESCs you might want to read
 
  * [BLDC Commutation resources](https://es.mathworks.com/help/mcb/ref/sixstepcommutation.html)
  * [How to make your own esc (by DroneMesh)](https://www.youtube.com/playlist?list=PLoPtpxJIxgnbG5owAAyvgVvzenaRd1DPr)
- * [Math routines]({{ '/mathroutines/' | relative_url }})
+ * [Math routines](http://www.microshadow.com/files/files8051/math8051.asm)
  * [DSHOT - The missing handbook](https://brushlesswhoop.com/dshot-and-bidirectional-dshot/)
 
 ## Contribute
