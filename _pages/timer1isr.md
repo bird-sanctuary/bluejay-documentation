@@ -10,4 +10,4 @@ Triggered every **41.76ns**
 Used for:
 * DShot frame sync detection
 
-[![Int1isr]({{'/puml/svgs/DetailedDesign-Timer1isr.svg' | relative_url}})]({{'/puml/svgs/DetailedDesign-Timer1isr.svg' | relative_url}})
+[![Timer1isr]({{'/puml/svgs/DetailedDesign-Timer1isr.svg' | relative_url}})]({{'/puml/svgs/DetailedDesign-Timer1isr.svg' | relative_url}})

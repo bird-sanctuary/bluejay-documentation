@@ -53,5 +53,9 @@ Externally triggered interrupts are triggered on state change, so either falling
 * [INT0 ISR]({{ '/interrupt-0-isr/' | relative_url }})
 * [INT1 ISR]({{ '/interrupt-1-isr/' | relative_url }})
 
+## MACROS
+* [Decode_Dshot_2bit]({{ '/decode-dshot-2bit/' | relative_url }})
+* [OutsideRange]({{ '/outside-range/' | relative_url }})
+
 ## Misc
 * [SchedulerRun()]({{ '/scheduler-run/' | relative_url }})

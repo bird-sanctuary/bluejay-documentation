@@ -11,4 +11,4 @@ Used for:
 * RC pulse measurement
 * DShot telemetry pulse timing
 
-[![Int0isr]({{'/puml/svgs/DetailedDesign-Timer0isr.svg' | relative_url}})]({{'/puml/svgs/DetailedDesign-Timer0isr.svg' | relative_url}})
+[![Timer0isr]({{'/puml/svgs/DetailedDesign-Timer0isr.svg' | relative_url}})]({{'/puml/svgs/DetailedDesign-Timer0isr.svg' | relative_url}})
