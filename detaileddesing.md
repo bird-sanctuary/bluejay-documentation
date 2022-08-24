@@ -20,3 +20,4 @@ permalink: /detailed-design/
 
 ## Misc
 * [SchedulerRun()]({{ '/scheduler-run/' | relative_url }})
+* [WaitMs()]({{ '/wait-ms/' | relative_url }})
