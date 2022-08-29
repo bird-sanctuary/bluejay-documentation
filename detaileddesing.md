@@ -60,4 +60,7 @@ Externally triggered interrupts are triggered on state change, so either falling
 ## Misc
 * [SchedulerRun()]({{ '/scheduler-run/' | relative_url }})
 * [WaitMs()]({{ '/wait-ms/' | relative_url }})
+* [BeepSignalLost()]({{ '/beep-signal-lost/' | relative_url }})
+* [BeepMotorStalled()]({{ '/beep-motor-stalled/' | relative_url }})
+* [BeepEnterBootloader()]({{ '/beep-enter-bootloader/' | relative_url }})
 * [Beep()]({{ '/beep/' | relative_url }})
