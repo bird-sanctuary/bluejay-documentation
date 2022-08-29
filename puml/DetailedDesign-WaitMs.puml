@@ -29,6 +29,9 @@ split again
   :wait250ms;
   :Temp3 = 0;
   :Temp2 = 250;
+split again
+  -[hidden]->
+  :wait_ms;
 end split
 ->Increment for use with djnz;
 :Temp2 = Temp2 + 1;
