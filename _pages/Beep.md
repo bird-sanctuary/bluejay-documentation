@@ -17,3 +17,4 @@ there are normal versions of each beep and short versions of each beep. The high
 * [Signal lost]({{'/beep/signal-lost/' | relative_url}})
 * [Enter bootloader]({{'/beep/enter-bootloader/' | relative_url}})
 * [Motor stalled]({{'/beep/motor-stalled/' | relative_url}})
+* [Beacon]({{'/beep/beacon/' | relative_url}})

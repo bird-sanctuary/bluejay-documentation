@@ -5,6 +5,8 @@ permalink: /timer-2-isr/
 exclude: true
 ---
 
+> Show related code for [t2_int]({{'t2_int' | search_code_url}}){:target="_blank"}.
+
 Triggered every **32ms**
 
 Used for:
