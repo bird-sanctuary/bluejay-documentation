@@ -57,6 +57,12 @@ Externally triggered interrupts are triggered on state change, so either falling
 * [Decode_Dshot_2bit]({{ '/decode-dshot-2bit/' | relative_url }})
 * [OutsideRange]({{ '/outside-range/' | relative_url }})
 
+## System sounds
+* [Beep routines]({{ '/beep/' | relative_url }})
+* [Signal lost]({{ '/beep/signal-lost/' | relative_url }})
+* [Enter bootloader]({{ '/beep/enter-bootloader/' | relative_url }})
+* [Motor stalled]({{ '/beep/motor-stalled/' | relative_url }})
+
 ## Misc
 * [SchedulerRun()]({{ '/scheduler-run/' | relative_url }})
 * [WaitMs()]({{ '/wait-ms/' | relative_url }})
@@ -65,7 +71,3 @@ Externally triggered interrupts are triggered on state change, so either falling
 * [LedControl()]({{ '/led-control/' | relative_url }})
 * [SwitchPowerOff()]({{ '/switch-power-off/' | relative_url }})
 * [SetPwmLimit()]({{ '/set-pwm-limit/' | relative_url }})
-* [BeepSignalLost()]({{ '/beep-signal-lost/' | relative_url }})
-* [BeepMotorStalled()]({{ '/beep-motor-stalled/' | relative_url }})
-* [BeepEnterBootloader()]({{ '/beep-enter-bootloader/' | relative_url }})
-* [Beep()]({{ '/beep/' | relative_url }})
