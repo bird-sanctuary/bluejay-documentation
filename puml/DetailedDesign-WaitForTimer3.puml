@@ -1,0 +1,17 @@
+@startuml 
+start
+->WaitForTimer3 MACRO
+  Prepare telemetry packet while waiting for Timer3 to wrap;
+if (Flag_Telemetry_Pending == 0) then (yes)
+  if (Flag_Timer3_Pending == 0) then (yes)
+    stop
+  endif
+  :dshot_tlm_create_packet();
+endif
+while (Flag_Timer3_Pending == 1) is (yes)
+  :Wdt_Kick_Enable;
+endwhile
+stop
+@enduml
+
+
