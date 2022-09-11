@@ -1,0 +1,62 @@
+@startuml 
+split
+  -[hidden]->
+  :wait1ms;
+  :Temp3 = 0;
+  :Temp2 = 1;
+split again
+  -[hidden]->
+  :wait5ms;
+  :Temp3 = 0;
+  :Temp2 = 5;
+split again
+  -[hidden]->
+  :wait10ms;
+  :Temp3 = 0;
+  :Temp2 = 10;
+split again
+  -[hidden]->
+  :wait100ms;
+  :Temp3 = 0;
+  :Temp2 = 100;
+split again
+  -[hidden]->
+  :wait200ms;
+  :Temp3 = 0;
+  :Temp2 = 200;
+split again
+  -[hidden]->
+  :wait250ms;
+  :Temp3 = 0;
+  :Temp2 = 250;
+split again
+  -[hidden]->
+  :wait_ms;
+end split
+->Increment for use with djnz;
+:Temp2 = Temp2 + 1;
+:Temp3 = Temp3 + 1;
+while (Temp3 != 0)
+  ->yes;
+  while (Temp2 != 0)
+    ->yes;
+    :Temp1 = 24;
+    while (Temp1 != 0)
+      ->yes;
+      :A = 255;
+      while (A != 0)
+        ->yes;
+        :A = A - 1;
+      endwhile
+      :Temp1 = Temp1 - 1;
+    endwhile
+    :Temp2 = Temp2 - 1;
+  endwhile
+  :Temp3 = Temp3 - 1;
+endwhile
+:ret;
+stop
+@enduml
+
+
+

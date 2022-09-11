@@ -1,0 +1,28 @@
+@startuml 
+start
+->Int0 interrupt routine. Triggered when a falling edge happens. 
+
+Datas:
+ - Uses register bank 1
+ - Temp1 - Rx buffer pointer, that contains times between falling edges
+ - TL0 - Timer 0 low byte. Contains time between two falling edges
+ - TL1 - Timer 1 low byte. To be loaded with DShot_Timer_Preset value. 
+ ;
+:push ACC;
+->Read timer 0 low byte;
+:A = TL0;
+->Set timer 1 low byte to reset / synchronize timer 1;
+:TL1 = DShot_Timer_Preset;
+->Store timer 0 edge time in rx buffer
+Temp1 in register bank 1 points to pwm timings;
+:push PSW;
+:PSW = 0x08;
+:*Temp1 = A;
+:Temp1++;
+:pop PSW;
+:pop ACC;
+:reti;
+stop
+@enduml
+
+

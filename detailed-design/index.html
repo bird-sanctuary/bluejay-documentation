@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <title>Detailed Design</title>
+  <meta name="description" content="Everything you always wanted to know about everyones favourite 8 Bit ESC firmware. More details than you can handle: Flow-charts and walls of text.">
+
+  <link rel="stylesheet" href="/bluejay-documentation/assets/main.css">
+  <link rel="stylesheet" href="/bluejay-documentation/assets/css/styles.css">
+  <link rel="canonical" href="https://bird-sanctuary.github.io//bluejay-documentation/detailed-design/">
+  <link rel="alternate" type="application/rss+xml" title="Bluejay Documentation" href="/bluejay-documentation/feed.xml">
+
+  
+</head><body><header class="site-header">
+  <div class="wrapper"><a class="site-title" rel="author" href="/bluejay-documentation/">Bluejay Documentation</a><nav class="site-nav">
+        <input type="checkbox" id="nav-trigger" class="nav-trigger" />
+        <label for="nav-trigger">
+          <span class="menu-icon">
+            <svg viewBox="0 0 18 15" width="18px" height="15px">
+              <path d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.032C17.335,0,18,0.665,18,1.484L18,1.484z M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.032C17.335,6.031,18,6.696,18,7.516L18,7.516z M18,13.516C18,14.335,17.335,15,16.516,15H1.484 C0.665,15,0,14.335,0,13.516l0,0c0-0.82,0.665-1.483,1.484-1.483h15.032C17.335,12.031,18,12.695,18,13.516L18,13.516z"/>
+            </svg>
+          </span>
+        </label>
+
+        <div class="trigger"><a class="page-link" href="/bluejay-documentation/deadtime/">Deadtime</a><a class="page-link" href="/bluejay-documentation/detailed-design/">Detailed Design</a><a class="page-link" href="/bluejay-documentation/mcus/">MCUs</a></div>
+      </nav></div>
+</header>
+<main class="page-content" aria-label="Content">
+      <div class="wrapper">
+        <article class="post">
+
+  <header class="post-header">
+    <h1 class="post-title">Detailed Design</h1>
+  </header>
+
+  <div class="post-content">
+    <p>Two different kinds of interrupts exist - <strong>timer based</strong> and <strong>external</strong>. Bluejay is taking advantage of both types for different tasks. Interrupt Service Routines are the functions invoked when an interrupt is triggered and take over code execution immediately - no matter what the main code execution is doing, it is stopped, the interrupt service routine takes over, does its job and regular code execution takes over again.</p>
+
+<blockquote>
+  <p>Best practice is to keep interrupt service routines as short as possible as not to run into race conditions where one routine is interrupted by another routine.</p>
+</blockquote>
+
+<p>Interrupts can also be disabled, which makes sense if you for example know that you have to finish a certain block of code without any further interruption. Oftentimes interrupts are disabled in interrupt service routines as to not run into any race conditions.</p>
+
+<h2 id="timer-interrupts">Timer Interrupts</h2>
+<p>Timer based interrupts, trigger - as the name suggests - at given times. Timer based interrupts consist of a counter, once it overflows back to zero, the matching ISR is triggered.</p>
+
+<p>The calculation of the time is not as easy as just saying: “Trigger every 30ms”. The calculation is more involved:</p>
+
+<p>The MCU is clocked at a certain frequency - lets say in the case of a BB21 at maximum 50MHz, or in other words: 50000000 clock cycles per second.</p>
+
+<p>The clock frequency is divided by 12 (on 8051 based timers) and the timers counter is thus incremented every <strong>1 / (50MHz / 12) seconds = 240ns</strong>. Or in other words: The tick duration is 240ns.</p>
+
+<blockquote>
+  <p>EFM8 provides different sources for the clock frequency and depending on source also different divisors. When using the system clock, divisors for the timer can be: 12, 4 and 48 (on timer 0 and 1) or 12 on timers 2, 3 and 4. <br />
+If using an external clock, the divisor can only be 8.</p>
+</blockquote>
+
+<p>8051 based timers are (up to) 16Bit wide (having a low and a high Byte) and are thus capable of counting to 65535 before overflowing back to 0.</p>
+
+<p>If you want to invoke a routine every 10ms the calculation would look like so:</p>
+
+<blockquote>
+  <p>count = delay / tick<br />
+count = 10ms / 240ns = 41666.7</p>
+</blockquote>
+
+<p>since we can only count to integers we need to take the next closes value, so the count needs to be <strong>41667</strong>, actually resulting in an interval of <strong>10.00008ms</strong>.</p>
+
+<blockquote>
+  <p>count = 41667<br />
+regValue = maxValue - count<br />
+regValue = 65535 - 41667 = 23868</p>
+</blockquote>
+
+<p>which means that the register values would need to be set like so:</p>
+<blockquote>
+  <p>regValue = 0x5D3C <br />
+regValueHi = 0x5D <br />
+regValueLo = 0x3C</p>
+</blockquote>
+
+<ul>
+  <li><a href="/bluejay-documentation/timer-0-isr/">Timer 0 ISR</a></li>
+  <li><a href="/bluejay-documentation/timer-1-isr/">Timer 1 ISR</a></li>
+  <li><a href="/bluejay-documentation/timer-2-isr/">Timer 2 ISR</a></li>
+  <li><a href="/bluejay-documentation/timer-3-isr/">Timer 3 ISR</a></li>
+</ul>
+
+<h2 id="externally-triggered-interrupts">Externally triggered Interrupts</h2>
+<p>Externally triggered interrupts are a bit more intuitive: An external input triggers the according ISR. BB based MCUs have two interrupts with dedicated interrupt vectors that can be triggered externally. Technically GPIO pins can also be used as interrupts, although with a shared interrupt vector.</p>
+
+<p>Externally triggered interrupts are triggered on state change, so either falling edge, rising edge or both.</p>
+
+<ul>
+  <li><a href="/bluejay-documentation/interrupt-0-isr/">INT0 ISR</a></li>
+  <li><a href="/bluejay-documentation/interrupt-1-isr/">INT1 ISR</a></li>
+</ul>
+
+<h2 id="macros">MACROS</h2>
+<ul>
+  <li><a href="/bluejay-documentation/decode-dshot-2bit/">Decode_Dshot_2bit</a></li>
+  <li><a href="/bluejay-documentation/outside-range/">OutsideRange</a></li>
+  <li><a href="/bluejay-documentation/wait-for-timer3/">Wait_For_Timer3</a></li>
+</ul>
+
+<h2 id="sounds">Sounds</h2>
+<ul>
+  <li><a href="/bluejay-documentation/beep/">Beep routines</a></li>
+  <li><a href="/bluejay-documentation/beep/signal-lost/">Signal lost</a></li>
+  <li><a href="/bluejay-documentation/beep/enter-bootloader/">Enter bootloader</a></li>
+  <li><a href="/bluejay-documentation/beep/motor-stalled/">Motor stalled</a></li>
+  <li><a href="/bluejay-documentation/beep/play-beep-melody/">Startup Melody</a></li>
+</ul>
+
+<h2 id="misc">Misc</h2>
+<ul>
+  <li><a href="/bluejay-documentation/wait-ms/">Wait Routines</a></li>
+  <li><a href="/bluejay-documentation/led-control/">Led Control</a></li>
+  <li><a href="/bluejay-documentation/set-pwm-limit/">Pwm Limit</a></li>
+  <li><a href="/bluejay-documentation/switch-power-off/">Switch Power Off</a></li>
+  <li><a href="/bluejay-documentation/scheduler-run/">Scheduler</a></li>
+  <li><a href="/bluejay-documentation/outside-range/">Outside Range</a></li>
+  <li><a href="/bluejay-documentation/initialize-timing/">initialize_timing()</a></li>
+  <li><a href="/bluejay-documentation/calc-next-comm-period/">calc_next_comm_period()</a></li>
+</ul>
+
+  </div>
+
+</article>
+
+      </div>
+    </main><footer class="site-footer h-card">
+  <data class="u-url" href="/bluejay-documentation/"></data>
+
+  <div class="wrapper">
+
+    <h2 class="footer-heading">Bluejay Documentation</h2>
+
+    <div class="footer-col-wrapper">
+      <div class="footer-col footer-col-1">
+        <ul class="contact-list">
+          <li class="p-name">Bluejay Documentation</li></ul>
+      </div>
+
+      <div class="footer-col footer-col-2"><ul class="social-media-list"><li><a href="https://github.com/bird-sanctuary"><svg class="svg-icon"><use xlink:href="/bluejay-documentation/assets/minima-social-icons.svg#github"></use></svg> <span class="username">bird-sanctuary</span></a></li></ul>
+</div>
+
+      <div class="footer-col footer-col-3">
+        <p>Everything you always wanted to know about everyones favourite 8 Bit ESC firmware. More details than you can handle: Flow-charts and walls of text.</p>
+      </div>
+    </div>
+
+  </div>
+
+</footer>
+</body>
+
+</html>
