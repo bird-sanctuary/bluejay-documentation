@@ -56,6 +56,7 @@ Externally triggered interrupts are triggered on state change, so either falling
 ## MACROS
 * [Decode_Dshot_2bit]({{ '/decode-dshot-2bit/' | relative_url }})
 * [OutsideRange]({{ '/outside-range/' | relative_url }})
+* [Wait_For_Timer3]({{ '/wait-for-timer3/' | relative_url }})
 
 ## Sounds
 * [Beep routines]({{ '/beep/' | relative_url }})
@@ -71,3 +72,5 @@ Externally triggered interrupts are triggered on state change, so either falling
 * [Switch Power Off]({{ '/switch-power-off/' | relative_url }})
 * [Scheduler]({{ '/scheduler-run/' | relative_url }})
 * [Outside Range]({{ '/outside-range/' | relative_url }})
+* [initialize_timing()]({{ '/initialize-timing/' | relative_url }})
+* [calc_next_comm_period()]({{ '/calc-next-comm-period/' | relative_url }})
