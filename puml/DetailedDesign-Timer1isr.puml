@@ -1,35 +1,5 @@
 @startuml 
 start
-->OutsideRange function;
-if (Rcp_Outside_Range_Cnt < 255) then (yes)
-  :Rcp_Outside_Range_Cnt++;
-endif
-
-if (Rcp_Outside_Range_Cnt <= 50) then
-  ->yes -> RCP signal has not timed out, 
-  but pulses are not recognized as DShot
-  Set pulse lenght to 0 & reset dshot command;
-  :Flag_Rcp_Stop = 1;
-  :DShot_Cmd = 0;
-  :DShot_Cmd_Cnt = 0;
-else
-  ->no -> Set timeout count;
-  :Rcp_Timeout_Cntd = 10;
-endif
-
-->Do not send telemetry. Set tx pointer to start, 
-reset timer 0 and enable int0 and int1;
-:Temp1 = 0;
-:TL0 = 0;
-:IE_EX0 = 1;
-:IE_EX1 = 1;
-:ret;
-stop
-@enduml
-
-
-@startuml 
-start
 ->Timer1 interrupt routine:
 
   Decode DShot frame

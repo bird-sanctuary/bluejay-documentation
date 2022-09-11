@@ -1,0 +1,25 @@
+@startuml
+start
+->Beacon beep
+Beep with beacon strength
+Beep tone 1-5 in Temp1
+Requirements: Interrupts must be disabled and FETs turned off
+Set beacon beep strength;
+:Temp2 = @Pgm_Beacon_Strength;
+:Beep_Strength = *Temp2;
+if (Temp1 == 1) then (yes)
+  :beep_f1();
+else if (Temp1 == 2) then (yes)
+  :beep_f2();
+else if (Temp1 == 3) then (yes)
+  :beep_f3();
+else if (Temp1 == 4) then (yes)
+  :beep_f4();
+else
+  :beep_f5();
+endif
+->Set normal beep strength;
+:Temp2 = @Pgm_Beacon_Strength;
+:Beep_Strength = *Temp2;
+stop
+@enduml
