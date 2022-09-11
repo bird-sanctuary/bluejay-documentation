@@ -1,0 +1,11 @@
+@startuml
+start
+:beep_f3;
+:beep_f2;
+:beep_f1;
+:ret;
+stop
+@enduml
+
+
+
