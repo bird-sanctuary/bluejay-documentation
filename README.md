@@ -1,6 +1,18 @@
 # Bluejay Documentation
 The documentation can be viewed on [github pages](https://bird-sanctuary.github.io/bluejay-documentation/).
 
+## Custom filters
+The following custom liquid filters are  available:
+
+### search_code_url
+
+Will generate a URl linking to the github search result page for a given term within the repo set in the **github_bluejay_url** field in **_config.yml**.
+
+Example:
+```
+[t3_int]({{'t3_int' | search_code_url}}){:target="_blank"}.
+```
+
 ## Local development
 Install [Jekyll](https://jekyllrb.com/docs/) dependencies:
 ```
