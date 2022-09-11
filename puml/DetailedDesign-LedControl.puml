@@ -1,0 +1,40 @@
+@startuml 
+start
+
+:Temp1 = &Pgm_LED_Control;
+:A = *Temp1;
+:Temp2 = A;
+->Turn on led0;
+:A = A & 0x03;
+:Set_LED_0();
+if (A == 0) then (yes)
+  :Clear_LED_0();
+endif
+->Turn on led1;
+:A = Temp2;
+:A = A & 0x0C;
+:Set_LED_1();
+if (A == 0) then (yes)
+  :Clear_LED_1();
+endif
+->Turn on led2;
+:A = Temp2;
+:A = A & 0x30;
+:Set_LED_2();
+if (A == 0) then (yes)
+  :Clear_LED_2();
+endif
+->Turn on led3;
+:A = Temp2;
+:A = A & 0xC0;
+:Set_LED_3();
+if (A == 0) then (yes)
+  :Clear_LED_3();
+endif
+
+:ret;
+stop
+@enduml
+
+
+
