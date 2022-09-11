@@ -57,17 +57,17 @@ Externally triggered interrupts are triggered on state change, so either falling
 * [Decode_Dshot_2bit]({{ '/decode-dshot-2bit/' | relative_url }})
 * [OutsideRange]({{ '/outside-range/' | relative_url }})
 
-## System sounds
+## Sounds
 * [Beep routines]({{ '/beep/' | relative_url }})
 * [Signal lost]({{ '/beep/signal-lost/' | relative_url }})
 * [Enter bootloader]({{ '/beep/enter-bootloader/' | relative_url }})
 * [Motor stalled]({{ '/beep/motor-stalled/' | relative_url }})
+* [Startup Melody]({{ '/beep/play-beep-melody/' | relative_url }})
 
 ## Misc
-* [SchedulerRun()]({{ '/scheduler-run/' | relative_url }})
-* [WaitMs()]({{ '/wait-ms/' | relative_url }})
-* [BeaconBeep()]({{ '/beacon-beep/' | relative_url }})
-* [PlayBeepMelody()]({{ '/play-beep-melody/' | relative_url }})
-* [LedControl()]({{ '/led-control/' | relative_url }})
-* [SwitchPowerOff()]({{ '/switch-power-off/' | relative_url }})
-* [SetPwmLimit()]({{ '/set-pwm-limit/' | relative_url }})
+* [Wait Routines]({{ '/wait-ms/' | relative_url }})
+* [Led Control]({{ '/led-control/' | relative_url }})
+* [Pwm Limit]({{ '/set-pwm-limit/' | relative_url }})
+* [Switch Power Off]({{ '/switch-power-off/' | relative_url }})
+* [Scheduler]({{ '/scheduler-run/' | relative_url }})
+* [Outside Range]({{ '/outside-range/' | relative_url }})
