@@ -1,7 +1,0 @@
-@startuml 
-start
-:Comm_Period4x_L = 0;
-:Comm_Period4x_H = 0;
-:ret;
-stop
-@enduml
