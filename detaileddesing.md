@@ -67,10 +67,10 @@ Externally triggered interrupts are triggered on state change, so either falling
 
 ## Misc
 * [Wait Routines]({{ '/wait-ms/' | relative_url }})
+* [Scheduler]({{ '/scheduler-run/' | relative_url }})
 * [Led Control]({{ '/led-control/' | relative_url }})
 * [Pwm Limit]({{ '/set-pwm-limit/' | relative_url }})
 * [Switch Power Off]({{ '/switch-power-off/' | relative_url }})
-* [Scheduler]({{ '/scheduler-run/' | relative_url }})
-* [Outside Range]({{ '/outside-range/' | relative_url }})
 * [initialize_timing()]({{ '/initialize-timing/' | relative_url }})
 * [calc_next_comm_period()]({{ '/calc-next-comm-period/' | relative_url }})
+* [wait_for_comp_out()]({{ '/wait-for-comp-out/' | relative_url }})
