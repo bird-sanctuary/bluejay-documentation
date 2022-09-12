@@ -1,0 +1,80 @@
+@startuml 
+start
+->Wait for comparator to go low/high
+Scans for comparator going low/high
+Exit if zero cross timeout has elapsed;
+split
+  -[hidden]->
+  :wait_for_comp_out_low;
+  ->Desired comparator output;
+  :B = 0;
+  if (Flag_Dir_Change_Brake == 1) then
+    :B = 40;
+  endif
+split again
+  -[hidden]->
+  :wait_for_comp_out_high;
+  ->Desired comparator output;
+  :B = 40;
+  if (Flag_Dir_Change_Brake == 1) then
+    :B = 0;
+  endif
+end split
+#blue:(A)
+->(comp_init)
+Set demag detected flag as default;
+:Flag_Demag_Detected = 1;
+->Reset number of comparator reads;
+:Comparator_Read_Cnt = 0;
+->(comp_start)
+Set number of comparator readings required
+Number of OK readings required;
+:Temp3 = 1 << MCU_48MHZ;
+->Max number of readings required;
+:Temp4 = 1 << MCU_48MHZ;
+->Branch if high rpm;
+if (Flag_High_Rpm == 1) then
+  ->yes ->
+  (comp_check_timeout)
+  Has zero cross scan timeout elapsed?;
+  if (Flag_Timer3_Pending == 1) then
+    ->yes -> 
+    (comp_check_timeout_not_timed_out);
+  else
+    ->no -> Check that comparator has been read;
+    :A = Comparator_Read_Cnt;
+    ->If not yet read - ignore zero cross timeout);
+    if (A == 0) then
+      ->yes -> 
+      (comp_check_timeout_not_timed_out);
+    else
+      ->no;
+      if (Flag_Startup_Phase == 0) then
+        ->yes ->
+        (comp_check_timeout_timeout_extended);
+        :Flag_Comp_Timed_Out = 1;
+      else
+        ->no -> Extend timeout during startup;
+        :Startup_Zc_Timeout_Cntd = Startup_Zc_Timeout_Cntd - 1;
+        if (Startup_Zc_Timeout_Cntd != 0) then
+          ->yes ->
+          (comp_check_timeout_extend_timeout);
+        else
+        endif
+      endif
+    endif
+  endif
+  
+else
+  ->no;
+  if (Flag_Initial_Run_Phase == 1) then
+    ->yes -> Clear demag detected flag if start phases;
+    :Flag_Demag_Detected = 0;
+  endif
+endif
+:ret;
+stop
+@enduml
+
+
+
