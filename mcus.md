@@ -73,6 +73,8 @@ The biggest difference, limitation and reason why BB51 is not a simple drop in r
 |Positive  |10 on CMP0 or 12 on CMP1|5 on CMP0 or 4 on CMP1|
 |Negative  |10 on CMP0 or 12 on CMP1|3 on CMP0 or 3 on CMP1|
 
+> From now on, we will only look at the QFN20 package, since everything else is not important in our context.
+
 The above table is true only for the QFN28 package, considering th QFN20 package the reality looks like this:
 
 |Comparator|BB2                    |BB51                  |
@@ -89,24 +91,16 @@ CMP0 and CMP1 are a bit tricky - since they can span multiple ports (or parts of
 
 In concrete pin mappings it looks like this:
 
-|Pin |BB2    |BB51|
-|----|-------|----|
-|P0.0|Pos/Neg|Neg |
-|P0.1|Pos/Neg|Pos |
-|P0.2|Pos/Neg|Pos |
-|P0.3|Pos/Neg|Pos |
-|P0.4|Pos/Neg|Neg |
-|P0.5|Pos/Neg|Pos |
-|P0.6|Pos/Neg|Pos |
-|P0.7|Pos/Neg|Neg |
-|----|-------|----|
-|P1.0|Pos/Neg|Pos |
-|P1.1|Pos/Neg|Neg |
-|P1.2|Pos/Neg|Neg |
-|P1.3|Pos/Neg|Pos |
-|P1.4|Pos/Neg|Pos |
-|P1.5|Pos/Neg|Pos |
-|P1.6|Pos/Neg|Neg |
+|Port 0|BB2    |BB51|Port 1|BB2    |BB51|
+|------|-------|----|------|-------|----|
+|P0.0  |Pos/Neg|Neg |P1.0  |Pos/Neg|Pos |
+|P0.1  |Pos/Neg|Pos |P1.1  |Pos/Neg|Neg |
+|P0.2  |Pos/Neg|Pos |P1.2  |Pos/Neg|Neg |
+|P0.3  |Pos/Neg|Pos |P1.3  |Pos/Neg|Pos |
+|P0.4  |Pos/Neg|Neg |P1.4  |Pos/Neg|Pos |
+|P0.5  |Pos/Neg|Pos |P1.5  |Pos/Neg|Pos |
+|P0.6  |Pos/Neg|Pos |P1.6  |Pos/Neg|Neg |
+|P0.7  |Pos/Neg|Neg ||||
 
 You can clearly see, that the BB51 is by far not as flexible with Comparator polarity as the BB2 - this is very important when designing your circuit and also the main reason why **the BB51 is NOT a drop in replacement for the BB2**.
 
