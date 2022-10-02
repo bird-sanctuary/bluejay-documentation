@@ -27,7 +27,7 @@ The differences between the families is listed below:
 The above differences are kind of the "obvious" things, when it comes to internals there are major differences that are important for our use case:
 
 ### Crossbar
-The Crossbar is a mechanism to route pins to hardware functionality, you could for example use it to map the UART to spcific pins that are easiest for you to reach in your hardware design. Be aware that not all functions can be routed to any pin: Direct pin interrupts INT0 and INT1 can for example only be routet to pins on Port 0.
+The Crossbar is a mechanism to route pins to hardware functionality, you could for example use it to map the UART to specific pins that are easiest for you to reach in your hardware design. Be aware that not all functions can be routed to any pin: Direct pin interrupts INT0 and INT1 can for example only be routed to pins on Port 0.
 
 On BB1 and BB2 MCUs most ports (Port 0, Port 1 and Port 2) are connected to the Crossbar, not so on the BB51 - it only has Port 0 and Port 1 connected to the crossbar.
 
